@@ -1,8 +1,8 @@
- import streamlit as st
+import streamlit as st
 from datetime import datetime
 import random
 
-# የገጹን ስፋትና አርማ ማስተካከያ
+# የገጹን ስፋት ማስተካከያ
 st.set_page_config(page_title="ምስጢር ተርጓሚ", page_icon="🔐", layout="centered")
 
 # ቁልፎች
@@ -29,7 +29,6 @@ if option == "መመስጠር":
     if user_text:
         result = "".join([mapping.get(c, "000") for c in user_text])
         st.subheader("የተመሰጠረ ውጤት:-")
-        # ውጤቱ ሰፋ ባለ ሳጥን እንዲታይ ቁመቱን (height) ጨምረነዋል
         st.text_area("ኮፒ ለማድረግ እንዲመችህ እዚህ ጋር ተቀምጧል:-", result, height=300)
 else:
     user_code = st.text_area("የተመሰጠረ ቁጥር ያስገቡ:-", height=150)
