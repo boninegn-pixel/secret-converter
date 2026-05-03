@@ -1,11 +1,12 @@
-import streamlit as st
+ import streamlit as st
 from datetime import datetime
 import random
 
-# የፊደላት ዝርዝር
-keys = "ሀሁሂሃሄህሆለሉሊላሌልሎሐሑሒሓሔሕሖመሙሚማሜምሞሠሡሢሣሤሥሦረሩሪራሬርሮሰሱሲሳሴስሶሸሹሺሻሼሽሾቀቁቂቃቄቅቆበቡቢባቤብቦተቱቲታቴትቶቸቹቺቻቼችቾነኑኒናኔንኖአኡኢኣኤእኦከኩኪካኬክኮወዉዊዋዌውዎዘዙዚዛዜዝዞየዩዪያዬይዮደዱዲዳዴድዶጀጁጂጃጄጅጆገጉጊጋጌግጎጠጡጢጣጤጥጦጨጩጪጫጬጭጮፈፉፊፋፌፍፎፐፑፒፓፔፕፖ "
+# የገጹን ስፋትና አርማ ማስተካከያ
+st.set_page_config(page_title="ምስጢር ተርጓሚ", page_icon="🔐", layout="centered")
 
-st.set_page_config(page_title="ምስጢር ተርጓሚ", page_icon="🔐")
+# ቁልፎች
+keys = "ሀሁሂሃሄህሆለሉሊላሌልሎሐሑሒሓሔሕሖመሙሚማሜምሞሠሡሢሣሤሥሦረሩሪራሬርሮሰሱሲሳሴስሶሸሹሺሻሼሽሾቀቁቂቃቄቅቆበቡቢባቤብቦተቱቲታቴትቶቸቹቺቻቼችቾኀኁኂኃኄኅኆነኑኒናኔንኖኘኙኚኛኜኝኞአኡኢአኤእኦከኩኪካኬክኮኸኹኺኻኼኽኾወዉዊዋዌውዎዐዑዒዓዔዕዖዘዙዚዛዜዝዞዠኡዢዣዤዥዦየዩዪያዬይዮደዱዲዳዴድዶጀጁጂጃጄጅጆገጉጊጋጌግጎጠጡጢጣጤጥጦጨጩጪጫጬጭጮጰጱጲጳጴጵጶጸጹጺጻጼጽጾፀፁፂፃፄፅፆፈፉፊፋፌፍፎፐፑፒፓፔፕፖ "
 
 def get_daily_mapping():
     today = datetime.now().strftime("%Y-%m-%d")
@@ -17,22 +18,22 @@ def get_daily_mapping():
     return mapping, reverse_mapping
 
 st.title("🔐 ምስጢር ተርጓሚ")
-st.write(f"ዛሬ፦ {datetime.now().strftime('%Y-%m-%d')}")
-st.info("ይህ አፕ በየቀኑ ኮዱን ስለሚቀይር፣ መልእክቱ የሚፈታው በዕለቱ ብቻ ነው።")
+st.write(f"ዛሬ:- {datetime.now().strftime('%Y-%m-%d')}")
+st.info("ይህ አፕ በየቀኑ ኮዱ ስለሚቀየር መልእክቱ የሚፈታው በዕለቱ ብቻ ነው።")
 
 mapping, reverse_mapping = get_daily_mapping()
-option = st.radio("ምን ማድረግ ይፈልጋሉ?", ("መመሰጠር", "መተርጎም"))
+option = st.radio("ምን ማድረግ ይፈልጋሉ?", ("መመስጠር", "መተርጎም"))
 
-if option == "መመሰጠር":
-    user_text = st.text_area("አማርኛ ጽሁፍ ያስገቡ፦")
+if option == "መመስጠር":
+    user_text = st.text_area("አማርኛ ጽሁፍ ያስገቡ:-", height=150)
     if user_text:
         result = "".join([mapping.get(c, "000") for c in user_text])
-        st.subheader("የተመሰጠረ ውጤት፦")
-        st.code(result)
-
+        st.subheader("የተመሰጠረ ውጤት:-")
+        # ውጤቱ ሰፋ ባለ ሳጥን እንዲታይ ቁመቱን (height) ጨምረነዋል
+        st.text_area("ኮፒ ለማድረግ እንዲመችህ እዚህ ጋር ተቀምጧል:-", result, height=300)
 else:
-    user_code = st.text_area("የምስጢር ቁጥሩን ያስገቡ፦")
+    user_code = st.text_area("የተመሰጠረ ቁጥር ያስገቡ:-", height=150)
     if user_code:
         result = "".join([reverse_mapping.get(user_code[i:i+3], "?") for i in range(0, len(user_code), 3)])
-        st.subheader("የተፈታ መልእክት፦")
+        st.subheader("የተፈታ መልእክት:-")
         st.success(result)
