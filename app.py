@@ -1,5 +1,6 @@
 import streamlit as st
 from cryptography.fernet import Fernet
+import streamlit.components.v1 as components
 
 # ገጹን ማስተካከል
 st.set_page_config(page_title="Mister Terguami Pro", layout="centered")
@@ -11,7 +12,7 @@ if 'app_password' not in st.session_state:
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
 
-# --- የመግቢያ ክፍል (Login) ---
+# --- የመግቢያ ክፍል ---
 if not st.session_state.authenticated:
     st.title("🔐 መግቢያ")
     pwd_input = st.text_input("የአፑን የይለፍ ቃል ያስገቡ:", type="password")
@@ -33,21 +34,28 @@ cipher_suite = Fernet(st.session_state.key)
 
 tab1, tab2, tab3 = st.tabs(["መልዕክት እሰር", "መልዕክት ፍታ", "⚙️ ሴቲንግ"])
 
+# ኮፒ ለማድረግ የሚረዳ ትንሽ የ JavaScript ኮድ
+def copy_button(text_to_copy):
+    html_code = f"""
+    <button onclick="navigator.clipboard.writeText('{text_to_copy}')" 
+    style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; 
+    border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 5px;">
+    📋 ኮዱን ኮፒ አድርግ
+    </button>
+    """
+    return components.html(html_code, height=60)
+
 with tab1:
     user_text = st.text_area("የሚታሰረውን መልዕክት እዚህ ይጻፉ:", height=150)
     if st.button("በኮድ እሰር"):
         if user_text:
             token = cipher_suite.encrypt(user_text.encode()).decode()
             st.success("መልዕክቱ በስኬት ታስሯል!")
+            st.text_area("የታሰረው ውጤት:", value=token, height=150)
             
-            # የታሰረው ኮድ ሳጥን
-            st.text_area("የታሰረው ውጤት:", value=token, height=150, key="enc_result")
+            # የኮፒ በተን እዚህ ጋር ይገባል
+            copy_button(token)
             
-            # ኮፒ ማድረጊያ ቁልፍ
-            st.copy_to_clipboard(token)
-            st.info("ኮዱ በራሱ ኮፒ ሆኗል! ቀጥታ WhatsApp ላይ ሄደው 'Paste' ማድረግ ይችላሉ።")
-            
-            # WhatsApp መላኪያ
             whatsapp_url = f"https://wa.me/?text={token}"
             st.markdown(f'<a href="{whatsapp_url}" target="_blank"><button style="background-color:#25D366; color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; width:100%; font-size:18px; margin-top:10px;">📲 በ WhatsApp ላክ</button></a>', unsafe_allow_html=True)
         else:
@@ -62,10 +70,7 @@ with tab2:
             decrypted = custom_cipher.decrypt(code_to_decrypt.encode()).decode()
             st.success("መልዕክቱ ተፈቷል!")
             st.text_area("የተፈታ መልዕክት:", value=decrypted, height=150)
-            
-            # የተፈታውንም መልዕክት ኮፒ ለማድረግ
-            st.copy_to_clipboard(decrypted)
-            st.toast("የተፈታው መልዕክት ኮፒ ሆኗል!")
+            copy_button(decrypted)
         except:
             st.error("ቁልፉ ወይም ኮዱ ስህተት ነው!")
 
@@ -73,11 +78,7 @@ with tab3:
     st.subheader("የአፕ ሴቲንግ")
     current_key = st.session_state.key.decode()
     st.info(f"የአሁኑ መቆለፊያ ቁልፍ (Key): {current_key}")
-    
-    # ቁልፉን (Key) ኮፒ ማድረጊያ
-    if st.button("ቁልፉን (Key) ኮፒ አድርግ"):
-        st.copy_to_clipboard(current_key)
-        st.success("ቁልፉ ኮፒ ሆኗል!")
+    copy_button(current_key)
         
     st.write("---")
     st.write("የመግቢያ Password መቀየሪያ")
