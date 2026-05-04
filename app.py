@@ -32,39 +32,55 @@ if 'key' not in st.session_state:
 
 cipher_suite = Fernet(st.session_state.key)
 
-tab1, tab2, tab3 = st.tabs(["መልዕክት እሰር", "መልዕክት ፍታ", "⚙️ ሴቲንግ"])
-
-# ኮፒ ለማድረግ የሚረዳ ትንሽ የ JavaScript ኮድ
+# ኮፒ ለማድረግ የሚረዳ የ JavaScript ኮድ
 def copy_button(text_to_copy):
     html_code = f"""
     <button onclick="navigator.clipboard.writeText('{text_to_copy}')" 
     style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; 
     border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 5px;">
-    📋 ኮዱን ኮፒ አድርግ
+    📋 ኮፒ አድርግ
     </button>
     """
     return components.html(html_code, height=60)
 
+tab1, tab2, tab3 = st.tabs(["መልዕክት እሰር", "መልዕክት ፍታ", "⚙️ ሴቲንግ"])
+
 with tab1:
-    user_text = st.text_area("የሚታሰረውን መልዕክት እዚህ ይጻፉ:", height=150)
-    if st.button("በኮድ እሰር"):
+    # የጽሁፍ ሳጥኑን ለማጽዳት እንዲረዳ "key" ሰጥተነዋል
+    user_text = st.text_area("የሚታሰረውን መልዕክት እዚህ ይጻፉ:", height=150, key="encrypt_input")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        process_btn = st.button("🔐 በኮድ እሰር", use_container_width=True)
+    with col2:
+        # ሳጥኑን የሚያጸዳ ቁልፍ
+        if st.button("🗑️ አጽዳ (Delete)", use_container_width=True):
+            st.session_state.encrypt_input = ""
+            st.rerun()
+
+    if process_btn:
         if user_text:
             token = cipher_suite.encrypt(user_text.encode()).decode()
             st.success("መልዕክቱ በስኬት ታስሯል!")
             st.text_area("የታሰረው ውጤት:", value=token, height=150)
-            
-            # የኮፒ በተን እዚህ ጋር ይገባል
             copy_button(token)
             
             whatsapp_url = f"https://wa.me/?text={token}"
             st.markdown(f'<a href="{whatsapp_url}" target="_blank"><button style="background-color:#25D366; color:white; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; width:100%; font-size:18px; margin-top:10px;">📲 በ WhatsApp ላክ</button></a>', unsafe_allow_html=True)
-        else:
-            st.warning("እባክዎ መጀመሪያ መልዕክት ይጻፉ።")
 
 with tab2:
-    code_to_decrypt = st.text_area("የታሰረውን ኮድ እዚህ ያስገቡ:", height=150)
+    code_to_decrypt = st.text_area("የታሰረውን ኮድ እዚህ ያስገቡ:", height=150, key="decrypt_input")
     input_key = st.text_input("የምስጠራ ቁልፉን (Key) ያስገቡ:")
-    if st.button("መልዕክቱን ፍታ"):
+    
+    col3, col4 = st.columns(2)
+    with col3:
+        decrypt_btn = st.button("🔓 መልዕክቱን ፍታ", use_container_width=True)
+    with col4:
+        if st.button("🗑️ አጽዳ", use_container_width=True):
+            st.session_state.decrypt_input = ""
+            st.rerun()
+
+    if decrypt_btn:
         try:
             custom_cipher = Fernet(input_key.encode())
             decrypted = custom_cipher.decrypt(code_to_decrypt.encode()).decode()
